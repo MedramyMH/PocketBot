@@ -7,10 +7,10 @@ RUN apk add --no-cache python3 py3-pip
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # Install Node dependencies
-RUN npm ci --omit=dev
+RUN npm install --production
 
 # Copy application files
 COPY . .
