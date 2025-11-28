@@ -15,7 +15,7 @@ export default function DashboardHeader({ botRunning, onStart, onStop }: Dashboa
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Pocketoptionbot" className="h-10 w-10 object-contain" />
+              <img src="/logo.png" alt="Pocketoptionbot" className="h-16 w-16 object-contain" />
               <div>
                 <h1 className="text-xl font-bold tracking-tight">Pocketoptionbot_v1.0</h1>
                 <p className="text-sm text-muted-foreground">SAR Multi-Timeframe · Real Account · uid:97498220</p>
