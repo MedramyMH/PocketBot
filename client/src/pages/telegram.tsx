@@ -12,6 +12,31 @@ interface BotStatus {
   recentTrades: any[];
 }
 
+// Telegram Web App API
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp: {
+        ready: () => void;
+        expand: () => void;
+        setHeaderColor: (color: string) => void;
+        setBackgroundColor: (color: string) => void;
+        close: () => void;
+        showAlert: (message: string) => void;
+        initData: string;
+        initDataUnsafe: {
+          user?: {
+            id: number;
+            is_bot: boolean;
+            first_name: string;
+            username?: string;
+          };
+        };
+      };
+    };
+  }
+}
+
 export default function TelegramPage() {
   const [, navigate] = useLocation();
   const [status, setStatus] = useState<BotStatus | null>(null);
@@ -19,8 +44,16 @@ export default function TelegramPage() {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Initialize Telegram Web App
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      window.Telegram.WebApp.setHeaderColor('#0f172a');
+      window.Telegram.WebApp.setBackgroundColor('#000000');
+    }
+
     const params = new URLSearchParams(window.location.search);
-    setUserId(params.get('user'));
+    setUserId(params.get('user') || window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString());
 
     const fetchStatus = async () => {
       try {
@@ -44,17 +77,25 @@ export default function TelegramPage() {
 
   const handleStartBot = async () => {
     try {
-      await fetch('/api/bot/start', { method: 'POST' });
+      const response = await fetch('/api/bot/start', { method: 'POST' });
+      if (response.ok) {
+        window.Telegram?.WebApp?.showAlert?.('✅ Bot started');
+      }
     } catch (err) {
       console.error('Failed to start bot:', err);
+      window.Telegram?.WebApp?.showAlert?.('❌ Failed to start bot');
     }
   };
 
   const handleStopBot = async () => {
     try {
-      await fetch('/api/bot/stop', { method: 'POST' });
+      const response = await fetch('/api/bot/stop', { method: 'POST' });
+      if (response.ok) {
+        window.Telegram?.WebApp?.showAlert?.('✅ Bot stopped');
+      }
     } catch (err) {
       console.error('Failed to stop bot:', err);
+      window.Telegram?.WebApp?.showAlert?.('❌ Failed to stop bot');
     }
   };
 
@@ -166,7 +207,8 @@ export default function TelegramPage() {
         {/* Footer */}
         <div className="text-center text-xs text-gray-500 pt-4">
           <p>🔄 Auto-refresh: 3s</p>
-          <p className="mt-1">pocketoption-bot.railway.app</p>
+          <p className="mt-1">Pocketoptionbot_v1.0 on Railway</p>
+          {userId && <p className="mt-1 text-gray-600">ID: {userId}</p>}
         </div>
       </div>
     </div>
