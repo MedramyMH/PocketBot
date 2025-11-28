@@ -16,6 +16,7 @@ RUN npm install
 COPY . .
 
 # Build the application
+# Force rebuild - cache invalidation timestamp
 RUN npm run build
 
 # Remove dev dependencies for smaller image
