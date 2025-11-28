@@ -53,14 +53,24 @@ export default function TelegramPage() {
     }
 
     const params = new URLSearchParams(window.location.search);
-    setUserId(params.get('user') || window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString());
+    const userIdFromUrl = params.get('user');
+    const userIdFromTg = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString();
+    setUserId(userIdFromUrl || userIdFromTg || null);
 
     const fetchStatus = async () => {
       try {
         const response = await fetch('/api/bot/status');
         if (response.ok) {
           const data = await response.json();
-          setStatus(data);
+          const formattedStatus: BotStatus = {
+            isRunning: data.running,
+            balance: data.balance || 0,
+            totalTrades: data.totalTrades || 0,
+            winRate: data.stats?.winRate || 0,
+            currentTrades: data.currentTrade ? [data.currentTrade] : [],
+            recentTrades: data.trades || []
+          };
+          setStatus(formattedStatus);
         }
       } catch (err) {
         console.error('Failed to fetch status:', err);
