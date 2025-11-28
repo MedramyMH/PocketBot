@@ -126,27 +126,29 @@ function startPythonService() {
     throw err;
   });
 
-  // Only setup vite in development mode
-  if (process.env.NODE_ENV !== "production") {
+  // Only setup vite in development mode (must NOT be in production code path)
+  if (process.env.NODE_ENV === "production") {
+    // In production, ALWAYS use static file serving
+    log("Production mode - serving static files");
+    serveStaticProduction(app);
+  } else {
+    // Development-only code path
     try {
-      // Use dynamic require-like import to prevent esbuild from analyzing vite-setup
-      const viteSetupPath = `./vite-setup.js`;
-      const { setupViteIfAvailable } = await import(viteSetupPath);
-      const viteSetup = await setupViteIfAvailable(app, server);
-      if (viteSetup) {
-        log("Vite development server setup complete");
+      // This entire block is NOT included in production builds
+      // because it's only executed when NODE_ENV !== "production"
+      const vitePath = `./vite.js`;
+      const viteModule = await import(vitePath);
+      const setupResult = await viteModule.setupVite(app, server);
+      if (setupResult) {
+        log("Vite development server ready");
       } else {
-        log("Vite not available, using static file serving");
+        log("Vite setup incomplete, using static fallback");
         serveStaticProduction(app);
       }
     } catch (err) {
-      log("Vite setup failed, using static file serving");
+      log(`Vite unavailable: ${err instanceof Error ? err.message : "unknown error"}`);
       serveStaticProduction(app);
     }
-  } else {
-    // In production, always use static file serving
-    log("Production mode detected, using static file serving");
-    serveStaticProduction(app);
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
