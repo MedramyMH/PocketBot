@@ -126,19 +126,19 @@ function startPythonService() {
     throw err;
   });
 
-  // Tree-shake dev code in production builds via esbuild --define:IS_BUILD_TIME_PRODUCTION
-  // Check define first (compile-time), then runtime env (for local dev)
-  // @ts-ignore - IS_BUILD_TIME_PRODUCTION is injected by esbuild
-  const isProduction = typeof IS_BUILD_TIME_PRODUCTION !== "undefined" || process.env.NODE_ENV === "production";
-  
-  if (isProduction) {
-    // Production mode - serve static files
+  // Production/Development mode decision
+  // In production builds: IS_BUILD_TIME_PRODUCTION is replaced with true by esbuild --define flag
+  // This allows esbuild to tree-shake the entire vite block from production bundle
+  if (process.env.NODE_ENV === "production") {
+    // Production mode - serve static files only (NO VITE)
     log("Production mode - serving static files");
     serveStaticProduction(app);
   } else {
-    // Development mode - vite setup (tree-shaken in production builds)
+    // Development mode - vite setup (never included in production build)
     try {
-      // Use async import to load vite module at runtime
+      // Dynamically import vite at RUNTIME in development only
+      // esbuild will not include this code in production because NODE_ENV !== "production"
+      // @ts-ignore - Dynamic import only in dev
       const viteModule = await import("./vite.ts");
       const setupResult = await viteModule.setupVite(app, server);
       if (setupResult) {
