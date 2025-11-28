@@ -109,7 +109,7 @@ function startPythonService() {
   startPythonService();
 
   // Wait a bit for Python service to be ready
-  await new Promise((resolve) => setTimeout(resolve), 2000);
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const server = await registerRoutes(app);
 
@@ -122,9 +122,15 @@ function startPythonService() {
   });
 
   // Only setup vite in development mode
-  if (app.get("env") === "development") {
-    const { setupVite } = await import("./vite");
-    await setupVite(app, server);
+  if (process.env.NODE_ENV !== "production" && app.get("env") === "development") {
+    try {
+      const viteMod = await import("./vite.js");
+      await viteMod.setupVite(app, server);
+      log("Vite development server setup complete");
+    } catch (err) {
+      log("Vite not available, using static file serving");
+      serveStaticProduction(app);
+    }
   } else {
     serveStaticProduction(app);
   }
