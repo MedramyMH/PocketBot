@@ -2,10 +2,9 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { spawn } from "child_process";
 import path from "path";
-
-// Standalone utilities (no vite dependency)
 import fs from "fs";
 
+// Standalone utilities (no vite dependency)
 function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -110,7 +109,7 @@ function startPythonService() {
   startPythonService();
 
   // Wait a bit for Python service to be ready
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve), 2000);
 
   const server = await registerRoutes(app);
 
@@ -122,9 +121,7 @@ function startPythonService() {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Only setup vite in development mode
   if (app.get("env") === "development") {
     const { setupVite } = await import("./vite");
     await setupVite(app, server);
