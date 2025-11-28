@@ -129,8 +129,8 @@ export default function TelegramPage() {
 
         {/* Open Dashboard Button */}
         <Button
-          onClick={() => navigate('/')}
-          className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-3 text-base"
+          onClick={() => window.open('/', '_blank')}
+          className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-700 text-white font-bold py-4 text-lg shadow-lg hover:shadow-cyan-500/50"
           data-testid="button-open-dashboard"
         >
           📊 Open Full Dashboard
