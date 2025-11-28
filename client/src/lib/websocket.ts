@@ -68,7 +68,8 @@ export function useWebSocket(
       if (isUnmountedRef.current) return;
 
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
+      const host = window.location.host || `${window.location.hostname}:${window.location.port || (protocol === "wss:" ? "443" : "80")}`;
+      const wsUrl = `${protocol}//${host}/ws`;
 
       console.log("[WebSocket] Connecting to", wsUrl);
 
