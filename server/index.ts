@@ -126,16 +126,14 @@ function startPythonService() {
     throw err;
   });
 
-  // Only setup vite in development mode (must NOT be in production code path)
-  if (process.env.NODE_ENV === "production") {
-    // In production, ALWAYS use static file serving
+  // Tree-shake dev code in production builds via esbuild --define:IS_BUILD_TIME_PRODUCTION
+  if (process.env.NODE_ENV === "production" || typeof (globalThis as any).IS_BUILD_TIME_PRODUCTION !== "undefined") {
+    // Production mode - serve static files
     log("Production mode - serving static files");
     serveStaticProduction(app);
   } else {
-    // Development-only code path
+    // Development mode - vite setup
     try {
-      // This entire block is NOT included in production builds
-      // because it's only executed when NODE_ENV !== "production"
       const vitePath = `./vite.js`;
       const viteModule = await import(vitePath);
       const setupResult = await viteModule.setupVite(app, server);
