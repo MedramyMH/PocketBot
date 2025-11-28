@@ -3,7 +3,9 @@ import { registerRoutes } from "./routes";
 import { spawn } from "child_process";
 import path from "path";
 
-// Standalone log function (no vite dependency)
+// Standalone utilities (no vite dependency)
+import fs from "fs";
+
 function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -12,6 +14,23 @@ function log(message: string, source = "express") {
     hour12: true,
   });
   console.log(`${formattedTime} [${source}] ${message}`);
+}
+
+function serveStaticProduction(app: any) {
+  const distPath = path.resolve(import.meta.dirname, "public");
+  
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    );
+  }
+
+  app.use(express.static(distPath));
+  
+  // fall through to index.html if the file doesn't exist
+  app.use("*", (_req: any, res: any) => {
+    res.sendFile(path.resolve(distPath, "index.html"));
+  });
 }
 
 const app = express();
@@ -110,8 +129,7 @@ function startPythonService() {
     const { setupVite } = await import("./vite");
     await setupVite(app, server);
   } else {
-    const { serveStatic } = await import("./vite");
-    serveStatic(app);
+    serveStaticProduction(app);
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
