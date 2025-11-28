@@ -69,7 +69,7 @@ router.post('/telegram/webhook', async (req: Request, res: Response): Promise<vo
       const username = from?.username || from?.first_name || 'User';
 
       if (text?.startsWith('/start')) {
-        const appUrl = `${process.env.RAILWAY_PUBLIC_DOMAIN || 'http://localhost:5000'}`;
+        const appUrl = process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'https://pocketoption-pocketoptionbotv10.up.railway.app';
         const webAppUrl = `${appUrl}/telegram?user=${from?.id}`;
 
         await sendTelegramMessage(
