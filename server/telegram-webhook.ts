@@ -35,6 +35,31 @@ async function sendTelegramMessage(text: string, parseMode = 'HTML'): Promise<bo
   }
 }
 
+async function sendTradeOpenSignal(asset: string, direction: string, entryPrice: number, confidence: number): Promise<void> {
+  const signal = direction.toUpperCase() === 'CALL' ? '▲' : '▼';
+  const text = `🚀 <b>TRADE OPENED</b>\n\n` +
+    `Asset: ${asset}\n` +
+    `Signal: ${direction.toUpperCase()} ${signal}\n` +
+    `Entry: $${entryPrice.toFixed(2)}\n` +
+    `Confidence: ${confidence}%`;
+  
+  await sendTelegramMessage(text);
+}
+
+async function sendTradeCloseSignal(asset: string, direction: string, entryPrice: number, exitPrice: number, pnl: number, totalProfit: number): Promise<void> {
+  const result = pnl >= 0 ? '✅ WIN' : '❌ LOSS';
+  const emoji = pnl >= 0 ? '💰' : '📉';
+  const text = `${emoji} <b>TRADE CLOSED</b>\n\n` +
+    `Asset: ${asset}\n` +
+    `Direction: ${direction.toUpperCase()}\n` +
+    `Entry: $${entryPrice.toFixed(2)}\n` +
+    `Exit: $${exitPrice.toFixed(2)}\n` +
+    `Result: ${result}\n\n` +
+    `<b>Session Profit: $${totalProfit.toFixed(2)}</b>`;
+  
+  await sendTelegramMessage(text);
+}
+
 router.post('/telegram/webhook', async (req: Request, res: Response): Promise<void> => {
   try {
     const update = req.body;
@@ -95,4 +120,4 @@ router.post('/telegram/webhook', async (req: Request, res: Response): Promise<vo
   }
 });
 
-export { router as telegramRouter, sendTelegramMessage };
+export { router as telegramRouter, sendTelegramMessage, sendTradeOpenSignal, sendTradeCloseSignal };
