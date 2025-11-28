@@ -4,7 +4,7 @@
 
 A full-stack trading bot application for binary options trading on PocketOption. The system features a React-based dashboard for monitoring bot performance and trade execution, backed by an Express server that manages bot control, WebSocket real-time updates, and PostgreSQL database integration. The bot implements a Parabolic SAR (Stop and Reverse) strategy across multiple timeframes (1m, 5m, 15m) with confluence-based trade signals for ETHUSD_otc binary options.
 
-**NEW**: Telegram Mini-App integration allows remote bot management via Telegram chat (ID: 7373419661) with live status updates, trade history, and control commands.
+**✅ TELEGRAM MINI-APP FULLY FUNCTIONAL**: Integration allows remote bot management via Telegram chat (ID: 7373419661) with live status updates, trade history, and control commands. WebSocket connection fixed for Telegram Web App context.
 
 ## User Preferences
 
@@ -214,3 +214,44 @@ These Python components are not actively used in the current TypeScript implemen
    url=https://{railway-domain}/api/telegram/webhook
    ```
 
+
+## Latest Updates (Nov 28, 2025)
+
+### ✅ Open Dashboard Button Added (Nov 28)
+- **Telegram Mini-App Enhanced**: Added "📊 Open Full Dashboard" button directly under header
+- **Gradient Button**: Cyan-to-blue gradient styling for better visibility
+- **Easy Navigation**: Users can quickly switch from mini-app to full dashboard
+
+### ✅ Production Build Fixed
+- **WebSocket Fix**: Updated `client/src/lib/websocket.ts` to correctly handle missing `window.location.port` in Telegram mini-app context
+  - Changed: `${window.location.hostname}:${window.location.port || "80"}` 
+  - To: Properly handle empty port with fallback to hostname only
+- **Production Bundling**: Updated esbuild configuration to exclude vite from production bundle
+- **Result**: Telegram mini-app now connects successfully with proper WebSocket URLs
+
+### Infrastructure Status
+- ✅ Local development: Fully functional
+- ✅ Telegram mini-app: WebSocket connection working
+- ⏳ Railway deployment: Requires GitHub build command update
+
+### 🔧 Railway Fix Instructions (For GitHub Repository)
+**Update `package.json` build script to:**
+```json
+"build": "vite build && esbuild server/index.ts --platform=node --packages=external --external:vite --external:./server/vite --bundle --format=esm --outdir=dist"
+```
+
+**Steps:**
+1. Go to GitHub repo: https://github.com/manuninkirill-bot/pocketoption
+2. Edit `package.json`
+3. Replace the build script with command above
+4. Commit and push changes
+5. Railway will auto-rebuild and deploy
+
+**Why this works:**
+- `--external:vite` tells esbuild to not include vite in the bundle
+- `--external:./server/vite` prevents vite-setup.ts from being bundled
+- Removes "Cannot find package 'vite'" error on Railway
+- Local development remains unchanged
+
+**Current Railway URL** (will work after build fix):
+https://pocketoption-pocketoptionbotv10.up.railway.app

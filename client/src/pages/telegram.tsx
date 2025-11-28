@@ -127,6 +127,15 @@ export default function TelegramPage() {
           {userId && <p className="text-xs opacity-75 mt-2">User: {userId}</p>}
         </Card>
 
+        {/* Open Dashboard Button */}
+        <Button
+          onClick={() => navigate('/')}
+          className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-3 text-base"
+          data-testid="button-open-dashboard"
+        >
+          📊 Open Full Dashboard
+        </Button>
+
         {/* Status Card */}
         {status && (
           <Card className="bg-slate-900 border-slate-700 p-4 space-y-3">
