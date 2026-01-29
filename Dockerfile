@@ -6,6 +6,14 @@ ARG CACHE_BUST=1
 # Install Python for microservice
 RUN apk add --no-cache python3 py3-pip
 
+# ... (Lines 1-7 are fine )
+# Install Python for microservice
+RUN apk add --no-cache python3 py3-pip
+
+# Install Python dependencies
+# po_service.py uses aiohttp
+RUN pip3 install aiohttp
+
 # Set working directory
 WORKDIR /app
 
