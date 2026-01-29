@@ -6,8 +6,14 @@ import { setupWebSocket } from "./websocket";
 import { telegramRouter } from "./telegram-webhook";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check for Railway
+  app.get("/health", (_req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Telegram webhook
   app.use("/api", telegramRouter);
+  
   // Bot control routes
   app.post("/api/bot/start", async (req, res) => {
     try {
